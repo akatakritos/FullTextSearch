@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30204.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FullTextIndex", "FullTextIndex\FullTextIndex.csproj", "{9FC3AC11-4AC1-40C9-8875-9A08D0DA18EC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FullTextIndex.Tests", "FullTextIndex.Tests\FullTextIndex.Tests.csproj", "{368A221B-4840-4420-9671-A6B829C24088}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9FC3AC11-4AC1-40C9-8875-9A08D0DA18EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FC3AC11-4AC1-40C9-8875-9A08D0DA18EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FC3AC11-4AC1-40C9-8875-9A08D0DA18EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FC3AC11-4AC1-40C9-8875-9A08D0DA18EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{368A221B-4840-4420-9671-A6B829C24088}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{368A221B-4840-4420-9671-A6B829C24088}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{368A221B-4840-4420-9671-A6B829C24088}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{368A221B-4840-4420-9671-A6B829C24088}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5C688DB1-0137-40F6-9D99-05BA6B76A25D}
+	EndGlobalSection
+EndGlobal
