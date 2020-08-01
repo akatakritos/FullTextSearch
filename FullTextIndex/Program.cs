@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
 
@@ -10,78 +12,40 @@ namespace FullTextIndex
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            var sw = Stopwatch.StartNew();
+            var entries = EntryReader.ReadDump(@"C:\Users\matt.burke.POINT\Downloads\enwiki-latest-abstract1.xml\enwiki-latest-abstract1.xml").ToList();
+            sw.Stop();
+            Console.WriteLine($"Read {entries.Count} in {sw.ElapsedMilliseconds}ms");
 
-            foreach(var entry in ReadDump(@"C:\Users\matt.burke.POINT\Downloads\enwiki-latest-abstract1.xml\enwiki-latest-abstract1.xml"))
+            sw.Restart();
+            var invertedIndex = new InvertedIndex(entries.Count);
+            foreach (var entry in entries)
+                invertedIndex.Index(entry);
+            sw.Stop();
+            Console.WriteLine($"Created inverted index of {entries.Count} items in {sw.ElapsedMilliseconds}ms");
+
+            var containsSearch = new ContainsSearch(entries);
+            sw.Restart();
+            var matches = containsSearch.Search("cat").Count();
+            sw.Stop();
+
+            foreach (var match in containsSearch.Search("cat"))
             {
-                Console.WriteLine(entry);
+                Console.WriteLine(match.Abstract);
             }
+            Console.WriteLine($"Contains - found {matches} matches in {sw.ElapsedMilliseconds}ms");
+
+            sw.Restart();
+            matches = invertedIndex.Search("cat").Count();
+            sw.Stop();
+
+            foreach (var match in invertedIndex.Search("cat"))
+                Console.WriteLine(match.Abstract);
+
+            Console.WriteLine($"Index - found {matches} matches in {sw.ElapsedMilliseconds}ms");
 
         }
 
-        private static IEnumerable<WikipediaEntry> ReadDump(string filename)
-        {
-            using (var reader = XmlReader.Create(filename))
-            {
-                while (reader.Read())
-                {
-                    if (reader.NodeType == XmlNodeType.Element && reader.Name == "doc")
-                    {
-                        yield return ReadEntry(reader);
-                    }
-                }
-            }
-        }
 
-        private static WikipediaEntry ReadEntry(XmlReader reader)
-        {
-            var entry = new WikipediaEntry();
-            while (reader.Read())
-            {
-
-                if (reader.Name == "title")
-                {
-                    entry.Title = reader.ReadElementContentAsString();
-                    continue;
-                }
-
-
-                if (reader.Name == "abstract")
-                {
-                    entry.Abstract = reader.ReadElementContentAsString();
-                    continue;
-                }
-
-                if (reader.Name == "url")
-                {
-                    entry.Url = reader.ReadElementContentAsString();
-                    continue;
-                }
-
-                if (reader.Name == "links")
-                {
-                    reader.Skip();
-                }
-
-                if (reader.NodeType == XmlNodeType.EndElement && reader.Name == "doc")
-                {
-                    return entry;
-                }
-            }
-
-            throw new InvalidOperationException("reached end of document without closing an entry");
-        }
-    }
-
-    class WikipediaEntry
-    {
-        public string Title { get; set; }
-        public string Url { get; set; }
-        public string Abstract { get; set; }
-
-        public override string ToString()
-        {
-            return $"{Title} - {Url} - {Abstract}";
-        }
     }
 }
