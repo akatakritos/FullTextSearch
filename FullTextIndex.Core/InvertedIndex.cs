@@ -10,6 +10,10 @@ namespace FullTextIndex.Core
         SimpleTokenizer tokenizer = new SimpleTokenizer();
         List<WikipediaEntry> entries;
         Dictionary<string, List<int>> index;
+        PorterStemmer stemmer = new PorterStemmer();
+
+        public int DocumentCount => entries.Count;
+        public int TermCount => index.Count;
 
         public InvertedIndex(int initialCapacity)
         {
@@ -19,7 +23,10 @@ namespace FullTextIndex.Core
 
         public void Index(WikipediaEntry entry)
         {
-            var tokens = tokenizer.GetTokens(entry.Abstract).Select(t => t.ToLowerInvariant());
+            var tokens = tokenizer.GetTokens(entry.Abstract)
+                .Select(t => t.ToLowerInvariant())
+                .Select(t => stemmer.Stem(t));
+
             var uniqueTokens = new HashSet<string>(tokens);
             foreach (var token in uniqueTokens)
             {
@@ -44,6 +51,8 @@ namespace FullTextIndex.Core
 
         public IEnumerable<WikipediaEntry> Search(string term)
         {
+            term = stemmer.Stem(term.ToLowerInvariant());
+
             if (index.ContainsKey(term))
             {
                 return index[term].Select(docIndex => entries[docIndex]);
