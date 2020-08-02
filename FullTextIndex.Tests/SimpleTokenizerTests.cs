@@ -18,6 +18,14 @@ namespace FullTextIndex.Tests
                 "A", "donut", "on", "a", "glass", "plate", "Only", "the", "donuts");
 
         }
+
+        [Fact]
+        public void GetTokens_SingleWord()
+        {
+            var subject = new SimpleTokenizer();
+            var tokens = subject.GetTokens("cat");
+            Check.That(tokens).ContainsExactly("cat");
+        }
        
     }
 }

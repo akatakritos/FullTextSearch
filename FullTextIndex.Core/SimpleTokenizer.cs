@@ -23,6 +23,9 @@ namespace FullTextIndex.Core
                     buffer.Append(c);
                 }
             }
+
+            if (buffer.Length > 0)
+                yield return buffer.ToString();
         }
 
         private bool IsAsciiLetter(char c)
