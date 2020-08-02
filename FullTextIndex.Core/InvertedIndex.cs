@@ -20,6 +20,7 @@ namespace FullTextIndex.Core
         SimpleTokenizer tokenizer = new SimpleTokenizer();
         Dictionary<string, List<string>> index;
         PorterStemmer stemmer = new PorterStemmer();
+        EnglishStopWordsFilter stopWordsFilter = new EnglishStopWordsFilter();
 
         public int DocumentCount { get; private set; } = 0;
         public int TermCount => index.Count;
@@ -31,8 +32,8 @@ namespace FullTextIndex.Core
 
         public void Index(string documentId, string content)
         {
-            var tokens = tokenizer.GetTokens(content)
-                .Select(t => t.ToLowerInvariant())
+            var tokens = tokenizer.GetTokens(content.ToLowerInvariant())
+                .Where(t => !stopWordsFilter.IsStopWord(t))
                 .Select(t => stemmer.Stem(t))
                 .Distinct();
 
@@ -59,8 +60,8 @@ namespace FullTextIndex.Core
 
         public IEnumerable<SearchResult> Search(string query)
         {
-            var terms = tokenizer.GetTokens(query)
-                   .Select(term => term.ToLowerInvariant())
+            var terms = tokenizer.GetTokens(query.ToLowerInvariant())
+                   .Where(term => !stopWordsFilter.IsStopWord(term))
                    .Select(term => stemmer.Stem(term))
                    .Distinct();
 
