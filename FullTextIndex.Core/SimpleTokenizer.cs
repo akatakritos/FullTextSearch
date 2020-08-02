@@ -10,7 +10,7 @@ namespace FullTextIndex.Core
             var buffer = new StringBuilder();
             foreach (var c in content)
             {
-                if (!char.IsLetter(c) && !char.IsNumber(c))
+                if (!IsAsciiLetter(c) && !char.IsNumber(c))
                 {
                     if (buffer.Length > 0)
                     {
@@ -23,6 +23,11 @@ namespace FullTextIndex.Core
                     buffer.Append(c);
                 }
             }
+        }
+
+        private bool IsAsciiLetter(char c)
+        {
+            return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
         }
     }
 }
