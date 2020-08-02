@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,19 +24,47 @@ namespace FullTextIndex.UI
 
         private async Task PopulateIndex()
         {
-            await Task.Run(() =>
+
+            if (File.Exists("index.json"))
             {
-                var entries = EntryReader.ReadDump(@"C:\Users\matt.burke.POINT\Downloads\enwiki-latest-abstract1.xml\enwiki-latest-abstract1.xml");
-
-                var invertedIndex = new InvertedIndex();
-                foreach (var entry in entries)
+                await Task.Run(() =>
                 {
-                    invertedIndex.Index(entry.DocumentId, entry.Abstract);
-                    documents.Add(entry);
-                }
+                    documents = EntryReader.ReadDump(@"C:\Users\matt.burke.POINT\Downloads\enwiki-latest-abstract1.xml\enwiki-latest-abstract1.xml")
+                        .ToList();
+                });
 
-                this.index = invertedIndex;
-            });
+                var serializer = new JsonIndexPersister();
+                index = await serializer.RestpreAsync("index.json");
+            }
+            else
+            {
+                await Task.Run(async () =>
+                {
+                    var entries = EntryReader.ReadDump(@"C:\Users\matt.burke.POINT\Downloads\enwiki-latest-abstract1.xml\enwiki-latest-abstract1.xml");
+
+                    var invertedIndex = new InvertedIndex();
+                    foreach (var entry in entries)
+                    {
+                        invertedIndex.Index(entry.DocumentId, entry.Abstract);
+                        documents.Add(entry);
+                    }
+
+                    index = invertedIndex;
+
+                });
+
+                try
+                {
+
+                    var serializer = new JsonIndexPersister();
+                    await serializer.PersistAsync("index.json", index);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show("Failed to persist index " + e.Message);
+                }
+            }
+
 
             lblStatus.Text = $"Index: {index.DocumentCount:n0} docs {index.TermCount:n0} terms";
             btnSearch.Enabled = true;
@@ -52,7 +81,7 @@ namespace FullTextIndex.UI
             lvResults.BeginUpdate();
 
             var sw = Stopwatch.StartNew();
-            foreach(var result in index.Search(txtSearch.Text))
+            foreach (var result in index.Search(txtSearch.Text))
             {
                 var entry = documents[int.Parse(result.DocumentId)];
                 lvResults.Items.Add(new ListViewItem(new string[] { entry.Title, entry.Abstract }));

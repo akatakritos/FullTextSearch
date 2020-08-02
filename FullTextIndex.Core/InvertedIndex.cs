@@ -15,6 +15,13 @@ namespace FullTextIndex.Core
         }
     }
 
+    public class IndexState
+    {
+        public Dictionary<string, List<string>> Index { get; set; }
+    }
+        
+
+
     public class InvertedIndex
     {
         SimpleTokenizer tokenizer = new SimpleTokenizer();
@@ -28,6 +35,19 @@ namespace FullTextIndex.Core
         public InvertedIndex()
         {
             index = new Dictionary<string, List<string>>();
+        }
+
+        internal InvertedIndex(IndexState state)
+        {
+            index = state.Index;
+        }
+
+        internal IndexState GetStateForSerialization()
+        {
+            return new IndexState
+            {
+                Index = index
+            };
         }
 
         public void Index(string documentId, string content)
