@@ -122,5 +122,37 @@ namespace FullTextIndex.Core
         {
             return !IsConsonant(index);
         }
+
+        public bool EndsWithDoubleConsonant
+        {
+            get
+            {
+                if (Length < 2)
+                    return false;
+
+                return IsConsonant(Length - 1) && IsConsonant(Length - 2);
+            }
+        }
+
+        public void CondenseDoubleSuffix()
+        {
+            Value = Value.Substring(0, Value.Length - 1);
+        }
+
+        public void Append(string suffix)
+        {
+            Value += suffix;
+        }
+
+        // the stem ends cvc, where the second c is not W, X or Y(e.g. -WIL, -HOP).
+        public bool StarO()
+        {
+            if (Value.Length < 3) return false;
+            var endsCVC = IsConsonant(Length - 3) && IsVowel(Length - 2) && IsConsonant(Length - 1);
+            var secondC = this[Length - 1];
+
+            return endsCVC && !(secondC == 'w' || secondC == 'x' || secondC == 'y');
+
+        }
     }
 }
