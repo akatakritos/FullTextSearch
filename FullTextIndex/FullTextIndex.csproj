@@ -5,4 +5,8 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\FullTextIndex.Core\FullTextIndex.Core.csproj" />
+  </ItemGroup>
+
 </Project>

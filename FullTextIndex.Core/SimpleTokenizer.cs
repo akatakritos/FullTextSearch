@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 
-namespace FullTextIndex
+namespace FullTextIndex.Core
 {
     public class SimpleTokenizer
     {

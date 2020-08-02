@@ -1,3 +1,4 @@
+using FullTextIndex.Core;
 using NFluent;
 using System;
 using Xunit;

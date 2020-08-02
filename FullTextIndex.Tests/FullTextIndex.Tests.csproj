@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FullTextIndex\FullTextIndex.csproj" />
+    <ProjectReference Include="..\FullTextIndex.Core\FullTextIndex.Core.csproj" />
   </ItemGroup>
 
 </Project>

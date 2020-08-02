@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FullTextIndex.Core;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 
-namespace FullTextIndex
+namespace FullTextIndex.Core
 {
     public static class EntryReader
     {

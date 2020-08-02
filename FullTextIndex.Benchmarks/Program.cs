@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
+using FullTextIndex.Core;
 using System;
 using System.Linq;
 
