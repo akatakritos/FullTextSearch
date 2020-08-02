@@ -5,60 +5,68 @@ using System.Runtime.Serialization;
 
 namespace FullTextIndex.Core
 {
+    public class SearchResult
+    {
+        public string DocumentId { get; }
+
+        public SearchResult(string documentId)
+        {
+            DocumentId = documentId;
+        }
+    }
+
     public class InvertedIndex
     {
         SimpleTokenizer tokenizer = new SimpleTokenizer();
-        List<WikipediaEntry> entries;
-        Dictionary<string, List<int>> index;
+        Dictionary<string, List<string>> index;
         PorterStemmer stemmer = new PorterStemmer();
 
-        public int DocumentCount => entries.Count;
+        public int DocumentCount { get; private set; } = 0;
         public int TermCount => index.Count;
 
-        public InvertedIndex(int initialCapacity)
+        public InvertedIndex()
         {
-            entries = new List<WikipediaEntry>(initialCapacity);
-            index = new Dictionary<string, List<int>>();
+            index = new Dictionary<string, List<string>>();
         }
 
-        public void Index(WikipediaEntry entry)
+        public void Index(string documentId, string content)
         {
-            var tokens = tokenizer.GetTokens(entry.Abstract)
+            var tokens = tokenizer.GetTokens(content)
                 .Select(t => t.ToLowerInvariant())
                 .Select(t => stemmer.Stem(t));
 
             var uniqueTokens = new HashSet<string>(tokens);
             foreach (var token in uniqueTokens)
             {
-                Add(token, entries.Count);
+                Add(token, documentId);
             }
 
-            entries.Add(entry);
+            DocumentCount++;
         }
 
-        private void Add(string token, int documentIndex)
+        private void Add(string token, string documentId)
         {
             if (index.ContainsKey(token))
             {
-                index[token].Add(documentIndex);
+                index[token].Add(documentId);
                 return;
             }
 
-            var list = new List<int>();
-            list.Add(documentIndex);
+            var list = new List<string>();
+            list.Add(documentId);
             index[token] = list;
         }
 
-        public IEnumerable<WikipediaEntry> Search(string term)
+        public IEnumerable<SearchResult> Search(string term)
         {
             term = stemmer.Stem(term.ToLowerInvariant());
 
             if (index.ContainsKey(term))
             {
-                return index[term].Select(docIndex => entries[docIndex]);
+                return index[term].Select(documentId => new SearchResult(documentId));
             }
 
-            return Enumerable.Empty<WikipediaEntry>();
+            return Enumerable.Empty<SearchResult>();
         }
     }
 }

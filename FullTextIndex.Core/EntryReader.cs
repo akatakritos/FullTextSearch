@@ -9,13 +9,17 @@ namespace FullTextIndex.Core
     {
         public static IEnumerable<WikipediaEntry> ReadDump(string filename)
         {
+            int nextDocuentId = 0;
             using (var reader = XmlReader.Create(filename))
             {
                 while (reader.Read())
                 {
                     if (reader.NodeType == XmlNodeType.Element && reader.Name == "doc")
                     {
-                        yield return ReadEntry(reader);
+                        var entry = ReadEntry(reader);
+                        entry.DocumentId = nextDocuentId.ToString();
+                        nextDocuentId++;
+                        yield return entry;
                     }
                 }
             }

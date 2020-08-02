@@ -2,6 +2,7 @@
 {
     public class WikipediaEntry
     {
+        public string DocumentId { get; set; } = null!;
         public string Title { get; set; } = null!;
         public string Url { get; set; } = null!;
         public string Abstract { get; set; } = null!;

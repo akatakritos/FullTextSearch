@@ -15,6 +15,7 @@ namespace FullTextIndex.UI
     public partial class MainScreen : Form
     {
         private InvertedIndex index;
+        private List<WikipediaEntry> documents = new List<WikipediaEntry>();
         public MainScreen()
         {
             InitializeComponent();
@@ -26,9 +27,12 @@ namespace FullTextIndex.UI
             {
                 var entries = EntryReader.ReadDump(@"C:\Users\matt.burke.POINT\Downloads\enwiki-latest-abstract1.xml\enwiki-latest-abstract1.xml");
 
-                var invertedIndex = new InvertedIndex(700_000);
+                var invertedIndex = new InvertedIndex();
                 foreach (var entry in entries)
-                    invertedIndex.Index(entry);
+                {
+                    invertedIndex.Index(entry.DocumentId, entry.Abstract);
+                    documents.Add(entry);
+                }
 
                 this.index = invertedIndex;
             });
@@ -39,19 +43,22 @@ namespace FullTextIndex.UI
 
         private void MainScreen_Load(object sender, EventArgs e)
         {
-            PopulateIndex();
+            _ = PopulateIndex();
         }
 
         private void btnSearch_Click(object sender, EventArgs e)
         {
             lvResults.Items.Clear();
             lvResults.BeginUpdate();
+
             var sw = Stopwatch.StartNew();
-            foreach(var entry in index.Search(txtSearch.Text))
+            foreach(var result in index.Search(txtSearch.Text))
             {
+                var entry = documents[int.Parse(result.DocumentId)];
                 lvResults.Items.Add(new ListViewItem(new string[] { entry.Title, entry.Abstract }));
             }
             sw.Stop();
+
             lvResults.EndUpdate();
             lvResults.Columns[1].Width = -2;
             lblSearchResults.Text = $"Loaded {lvResults.Items.Count:n0} documents in {sw.ElapsedMilliseconds}ms";
