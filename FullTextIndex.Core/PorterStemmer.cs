@@ -22,6 +22,9 @@ namespace FullTextIndex.Core
             Step1C(word);
             Step2(word);
             Step3(word);
+            Step4(word);
+            Step5A(word);
+            Step5B(word);
 
             return word.Value;
         }
@@ -196,9 +199,68 @@ namespace FullTextIndex.Core
                 word.ReplaceSuffix("ful", "");
             else if (word.MeasurePreceding("ness") > 0 && word.EndsWith("ness"))
                 word.ReplaceSuffix("ness", "");
+        }
+
+        private void Step4(Word word)
+        {
+            if (word.MeasurePreceding("al") > 1 && word.EndsWith("al"))
+                word.ReplaceSuffix("al", "");
+            else if (word.MeasurePreceding("ance") > 1 && word.EndsWith("ance"))
+                word.ReplaceSuffix("ance", "");
+            else if (word.MeasurePreceding("ence") > 1 && word.EndsWith("ence"))
+                word.ReplaceSuffix("ence", "");
+            else if (word.MeasurePreceding("er") > 1 && word.EndsWith("er"))
+                word.ReplaceSuffix("er", "");
+            else if (word.MeasurePreceding("ic") > 1 && word.EndsWith("ic"))
+                word.ReplaceSuffix("ic", "");
+            else if (word.MeasurePreceding("able") > 1 && word.EndsWith("able"))
+                word.ReplaceSuffix("able", "");
+            else if (word.MeasurePreceding("ible") > 1 && word.EndsWith("ible"))
+                word.ReplaceSuffix("ible", "");
+            else if (word.MeasurePreceding("ant") > 1 && word.EndsWith("ant"))
+                word.ReplaceSuffix("ant", "");
+            else if (word.MeasurePreceding("ement") > 1 && word.EndsWith("ement"))
+                word.ReplaceSuffix("ement", "");
+            else if (word.MeasurePreceding("ment") > 1 && word.EndsWith("ment"))
+                word.ReplaceSuffix("ment", "");
+            else if (word.MeasurePreceding("ent") > 1 && word.EndsWith("ent"))
+                word.ReplaceSuffix("ent", "");
+            else if (word.MeasurePreceding("ent") > 1 && word.EndsWith("ent"))
+                word.ReplaceSuffix("ent", "");
+            else if (word.MeasurePreceding("tion") > 1 && word.EndsWith("tion"))
+                word.ReplaceSuffix("ion", "");
+            else if (word.MeasurePreceding("sion") > 1 && word.EndsWith("sion"))
+                word.ReplaceSuffix("ion", "");
+            else if (word.MeasurePreceding("ou") > 1 && word.EndsWith("ou"))
+                word.ReplaceSuffix("ou", "");
+            else if (word.MeasurePreceding("ism") > 1 && word.EndsWith("ism"))
+                word.ReplaceSuffix("ism", "");
+            else if (word.MeasurePreceding("ate") > 1 && word.EndsWith("ate"))
+                word.ReplaceSuffix("ate", "");
+            else if (word.MeasurePreceding("iti") > 1 && word.EndsWith("iti"))
+                word.ReplaceSuffix("iti", "");
+            else if (word.MeasurePreceding("ous") > 1 && word.EndsWith("ous"))
+                word.ReplaceSuffix("ous", "");
+            else if (word.MeasurePreceding("ive") > 1 && word.EndsWith("ive"))
+                word.ReplaceSuffix("ive", "");
+            else if (word.MeasurePreceding("ize") > 1 && word.EndsWith("ize"))
+                word.ReplaceSuffix("ize", "");
+        }
+
+        private void Step5A(Word word)
+        {
+            if (word.MeasurePreceding("e") > 1 && word.EndsWith("e"))
+                word.ReplaceSuffix("e", "");
+            else if (word.MeasurePreceding("e") == 1 && !word.StarO("e") &&  word.EndsWith("e"))
+                word.ReplaceSuffix("e", "");
 
         }
 
+        private void Step5B(Word word)
+        {
+            if (word.Measure > 1 && word.EndsWith("ll"))
+                word.ReplaceSuffix("ll", "l");
+        }
 
     }
 

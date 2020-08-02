@@ -145,10 +145,12 @@ namespace FullTextIndex.Core
         }
 
         // the stem ends cvc, where the second c is not W, X or Y(e.g. -WIL, -HOP).
-        public bool StarO()
+        public bool StarO(string suffix = "")
         {
-            if (Value.Length < 3) return false;
-            var endsCVC = IsConsonant(Length - 3) && IsVowel(Length - 2) && IsConsonant(Length - 1);
+            if (Value.Length < 3 + suffix.Length) return false;
+
+            int firstIndex = Length - suffix.Length - 3;
+            var endsCVC = IsConsonant(firstIndex) && IsVowel(firstIndex + 1) && IsConsonant(firstIndex + 2);
             var secondC = this[Length - 1];
 
             return endsCVC && !(secondC == 'w' || secondC == 'x' || secondC == 'y');

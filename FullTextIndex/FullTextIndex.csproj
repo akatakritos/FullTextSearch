@@ -9,4 +9,10 @@
     <ProjectReference Include="..\FullTextIndex.Core\FullTextIndex.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="diff.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
