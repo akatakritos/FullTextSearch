@@ -219,17 +219,25 @@ namespace FullTextIndex.Core
                 word.ReplaceSuffix("ible", "");
             else if (word.MeasurePreceding("ant") > 1 && word.EndsWith("ant"))
                 word.ReplaceSuffix("ant", "");
-            else if (word.MeasurePreceding("ement") > 1 && word.EndsWith("ement"))
-                word.ReplaceSuffix("ement", "");
-            else if (word.MeasurePreceding("ment") > 1 && word.EndsWith("ment"))
-                word.ReplaceSuffix("ment", "");
-            else if (word.MeasurePreceding("ent") > 1 && word.EndsWith("ent"))
-                word.ReplaceSuffix("ent", "");
-            else if (word.MeasurePreceding("ent") > 1 && word.EndsWith("ent"))
-                word.ReplaceSuffix("ent", "");
-            else if (word.MeasurePreceding("tion") > 1 && word.EndsWith("tion"))
+            // remember only longest applicable suffix applies
+            else if (word.EndsWith("ement"))
+            {
+                if (word.MeasurePreceding("ement") > 1)
+                    word.ReplaceSuffix("ement", "");
+            }
+            else if (word.EndsWith("ment"))
+            {
+                if (word.MeasurePreceding("ment") > 1)
+                    word.ReplaceSuffix("ment", "");
+            }
+            else if (word.EndsWith("ent"))
+            {
+                if (word.MeasurePreceding("ent") > 1)
+                    word.ReplaceSuffix("ent", "");
+            }
+            else if (word.MeasurePreceding("ion") > 1 && word.EndsWith("tion"))
                 word.ReplaceSuffix("ion", "");
-            else if (word.MeasurePreceding("sion") > 1 && word.EndsWith("sion"))
+            else if (word.MeasurePreceding("ion") > 1 && word.EndsWith("sion"))
                 word.ReplaceSuffix("ion", "");
             else if (word.MeasurePreceding("ou") > 1 && word.EndsWith("ou"))
                 word.ReplaceSuffix("ou", "");

@@ -12,6 +12,8 @@ namespace FullTextIndex.Core
             Value = value;
         }
 
+        public override string ToString() => Value.ToString();
+
         public bool EndsWith(string suffix)
         {
             return Value.EndsWith(suffix);
@@ -130,7 +132,7 @@ namespace FullTextIndex.Core
                 if (Length < 2)
                     return false;
 
-                return IsConsonant(Length - 1) && IsConsonant(Length - 2);
+                return IsConsonant(Length - 1) && this[Length - 1] == this[Length - 2];
             }
         }
 
@@ -151,7 +153,7 @@ namespace FullTextIndex.Core
 
             int firstIndex = Length - suffix.Length - 3;
             var endsCVC = IsConsonant(firstIndex) && IsVowel(firstIndex + 1) && IsConsonant(firstIndex + 2);
-            var secondC = this[Length - 1];
+            var secondC = this[firstIndex + 2];
 
             return endsCVC && !(secondC == 'w' || secondC == 'x' || secondC == 'y');
 

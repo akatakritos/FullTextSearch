@@ -2,6 +2,7 @@
 using NFluent;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -39,7 +40,7 @@ namespace FullTextIndex.Tests
         [InlineData("sky", "sky")]
         // step 2
         //[InlineData("relational", "relate")]
-        [InlineData("conditional", "condition")]
+        //[InlineData("conditional", "condition")]
         //[InlineData("rational", "rational")]
         //[InlineData("valenci", "valence")]
         //[InlineData("hesitanci", "hesitance")]
@@ -94,11 +95,34 @@ namespace FullTextIndex.Tests
         // step 5b
         [InlineData("controll", "control")]
         [InlineData("roll", "roll")]
+        // regressions
+        [InlineData("abashed", "abash")]
+        [InlineData("addition", "addit")]
+        [InlineData("agreement", "agreement")]
+        [InlineData("accidental", "accident")]
+        [InlineData("boxes", "box")]
         public void Stem(string input, string stem)
         {
             var stemmer = new PorterStemmer();
             Check.That(stemmer.Stem(input)).IsEqualTo(stem);
         }
 
-         }
+        [Fact]
+        public void Stem_PassesFullList()
+        {
+            var stemmer = new PorterStemmer();
+            var lines = File.ReadAllLines("diff.txt");
+            var regex = new Regex(@"^(\w+)\s+(\w+)$");
+
+            foreach (var line in lines)
+            {
+                var mc = regex.Match(line);
+                var input = mc.Groups[1].Value;
+                var expected = mc.Groups[2].Value;
+
+                var result = stemmer.Stem(input);
+                Check.That(result).As(input).IsEqualTo(expected);
+            }
+        }
+    }
 }

@@ -50,9 +50,12 @@ namespace FullTextIndex
             var lines = File.ReadAllLines("diff.txt");
             var regex = new Regex(@"^(\w+)\s+(\w+)$");
             var stemmer = new PorterStemmer();
+            int correct = 0;
+            int total = 0;
 
             foreach (var line in lines)
             {
+                total++;
                 var mc = regex.Match(line);
                 var input = mc.Groups[1].Value;
                 var expected = mc.Groups[2].Value;
@@ -61,15 +64,17 @@ namespace FullTextIndex
 
                 if (result == expected)
                 {
-                    Console.WriteLine($"+ {input} -> {expected}");
+                    correct++;
+                    //Console.WriteLine($"+ {input} -> {expected}");
                 }
                 else
                 {
                     Console.WriteLine($"- {input} -> {expected}. Got {result}");
                 } 
 
-
             }
+
+            Console.WriteLine($"Results: {correct * 100.0 / total}% ({correct}/{total})");
 
         }
 
