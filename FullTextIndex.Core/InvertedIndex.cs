@@ -33,10 +33,10 @@ namespace FullTextIndex.Core
         {
             var tokens = tokenizer.GetTokens(content)
                 .Select(t => t.ToLowerInvariant())
-                .Select(t => stemmer.Stem(t));
+                .Select(t => stemmer.Stem(t))
+                .Distinct();
 
-            var uniqueTokens = new HashSet<string>(tokens);
-            foreach (var token in uniqueTokens)
+            foreach (var token in tokens)
             {
                 Add(token, documentId);
             }
@@ -57,16 +57,26 @@ namespace FullTextIndex.Core
             index[token] = list;
         }
 
-        public IEnumerable<SearchResult> Search(string term)
+        public IEnumerable<SearchResult> Search(string query)
         {
-            term = stemmer.Stem(term.ToLowerInvariant());
+            var terms = tokenizer.GetTokens(query)
+                   .Select(term => term.ToLowerInvariant())
+                   .Select(term => stemmer.Stem(term))
+                   .Distinct();
 
-            if (index.ContainsKey(term))
+            HashSet<string> documentIds = new HashSet<string>();
+
+            foreach(var term in terms)
             {
-                return index[term].Select(documentId => new SearchResult(documentId));
+                if (index.ContainsKey(term))
+                {
+                    foreach (var documentId in index[term])
+                        documentIds.Add(documentId);
+                }
+
             }
 
-            return Enumerable.Empty<SearchResult>();
+            return documentIds.Select(id => new SearchResult(id));
         }
     }
 }
