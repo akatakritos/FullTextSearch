@@ -15,7 +15,7 @@ namespace FullTextIndex.UI
 {
     public partial class MainScreen : Form
     {
-        private InvertedIndex index;
+        private SingleFieldIndex index;
         private List<WikipediaEntry> documents = new List<WikipediaEntry>();
         public MainScreen()
         {
@@ -44,7 +44,7 @@ namespace FullTextIndex.UI
                     {
                         var entries = EntryReader.ReadDump(@"C:\Users\matt.burke.POINT\Downloads\enwiki-latest-abstract1.xml\enwiki-latest-abstract1.xml");
 
-                        var invertedIndex = new InvertedIndex();
+                        var invertedIndex = new SingleFieldIndex();
                         foreach (var entry in entries)
                         {
                             invertedIndex.Index(entry.DocumentId, entry.Abstract);

@@ -17,7 +17,7 @@ namespace FullTextIndex.Core
         }
     }
 
-    public class IndexState
+    public class SingleIndexState
     {
         public Dictionary<string, Dictionary<string, MatchData>> Index { get; set; }
         public Dictionary<string, DocumentData> DocumentData { get; set; }
@@ -32,13 +32,14 @@ namespace FullTextIndex.Core
     {
         public int Length { get; set; } = 0;
         public Dictionary<string, int> TermFrequencies { get; } = new Dictionary<string, int>();
+        // pull this up to the combined level
         public TermVector Vector { get; } = new TermVector();
     }
 
 
-    public class InvertedIndex
+    public class SingleFieldIndex
     {
-        Dictionary<string, Dictionary<string, MatchData>> index;
+        Dictionary<string, Dictionary<string, MatchData>> invertedIndex;
         Dictionary<string, DocumentData> documentData;
 
         SimpleTokenizer tokenizer = new SimpleTokenizer();
@@ -46,26 +47,26 @@ namespace FullTextIndex.Core
         EnglishStopWordsFilter stopWordsFilter = new EnglishStopWordsFilter();
 
         public int DocumentCount => documentData.Keys.Count;
-        public int TermCount => index.Count;
+        public int TermCount => invertedIndex.Count;
 
 
-        public InvertedIndex()
+        public SingleFieldIndex()
         {
-            index = new Dictionary<string, Dictionary<string, MatchData>>();
+            invertedIndex = new Dictionary<string, Dictionary<string, MatchData>>();
             documentData = new Dictionary<string, DocumentData>();
         }
 
-        internal InvertedIndex(IndexState state)
+        internal SingleFieldIndex(SingleIndexState state)
         {
-            index = state.Index;
+            invertedIndex = state.Index;
             documentData = state.DocumentData;
         }
 
-        internal IndexState GetStateForSerialization()
+        internal SingleIndexState GetStateForSerialization()
         {
-            return new IndexState
+            return new SingleIndexState
             {
-                Index = index,
+                Index = invertedIndex,
                 DocumentData = documentData
             };
         }
@@ -96,11 +97,11 @@ namespace FullTextIndex.Core
 
         private void Add(string token, string documentId)
         {
-            if (!index.ContainsKey(token))
-                index[token] = new Dictionary<string, MatchData>();
+            if (!invertedIndex.ContainsKey(token))
+                invertedIndex[token] = new Dictionary<string, MatchData>();
 
-            if (!index[token].ContainsKey(documentId))
-                index[token][documentId] = new MatchData();
+            if (!invertedIndex[token].ContainsKey(documentId))
+                invertedIndex[token][documentId] = new MatchData();
 
         }
 
@@ -121,9 +122,9 @@ namespace FullTextIndex.Core
 
             foreach (var term in terms)
             {
-                if (index.ContainsKey(term))
+                if (invertedIndex.ContainsKey(term))
                 {
-                    foreach (var documentId in index[term].Keys)
+                    foreach (var documentId in invertedIndex[term].Keys)
                         documentIds.Add(documentId);
                 }
             }
@@ -151,7 +152,9 @@ namespace FullTextIndex.Core
                 foreach (var term in doc.TermFrequencies.Keys)
                 {
                     var tf = doc.TermFrequencies[term];
-                    var documentsWithTerm = index[term].Keys.Count;
+                    var documentsWithTerm = invertedIndex[term].Keys.Count;
+
+                    // todo: idf includes all fields (sum or max frequency?) -- literature says max, lunr.js does sum
                     var idf = InverseDocumentFrequency.For(documentsWithTerm, DocumentCount);
                     var score = idf * ((k1 + 1) * tf) / (k1 * (1 - b + b * (doc.Length / averageDocumentLength)) + tf);
 

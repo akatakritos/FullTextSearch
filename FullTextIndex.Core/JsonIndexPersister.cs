@@ -9,7 +9,7 @@ namespace FullTextIndex.Core
 {
     public class JsonIndexPersister
     {
-        public Task PersistAsync(string filename, InvertedIndex index)
+        public Task PersistAsync(string filename, SingleFieldIndex index)
         {
             return Task.Run(() =>
             {
@@ -22,7 +22,7 @@ namespace FullTextIndex.Core
             });
         }
 
-        public Task<InvertedIndex> RestpreAsync(string filename)
+        public Task<SingleFieldIndex> RestpreAsync(string filename)
         {
             return Task.Run(() =>
             {
@@ -30,8 +30,8 @@ namespace FullTextIndex.Core
                 using (var stream = new JsonTextReader(new StreamReader(fs)))
                 {
                     var serializer = new JsonSerializer();
-                    var state = serializer.Deserialize<IndexState>(stream);
-                    return new InvertedIndex(state);
+                    var state = serializer.Deserialize<SingleIndexState>(stream);
+                    return new SingleFieldIndex(state);
                 }
             });
         }
