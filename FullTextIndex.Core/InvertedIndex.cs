@@ -8,45 +8,65 @@ namespace FullTextIndex.Core
     public class SearchResult
     {
         public string DocumentId { get; }
+        public float Score { get; }
 
-        public SearchResult(string documentId)
+        public SearchResult(string documentId, float score)
         {
             DocumentId = documentId;
+            Score = score;
         }
     }
 
     public class IndexState
     {
-        public Dictionary<string, List<string>> Index { get; set; }
+        public Dictionary<string, Dictionary<string, MatchData>> Index { get; set; }
+        public Dictionary<string, DocumentData> DocumentData { get; set; }
     }
-        
+
+
+    public class MatchData
+    {
+    }
+
+    public class DocumentData
+    {
+        public int Length { get; set; } = 0;
+        public Dictionary<string, int> TermFrequencies { get; } = new Dictionary<string, int>();
+        public TermVector Vector { get; } = new TermVector();
+    }
 
 
     public class InvertedIndex
     {
+        Dictionary<string, Dictionary<string, MatchData>> index;
+        Dictionary<string, DocumentData> documentData;
+
         SimpleTokenizer tokenizer = new SimpleTokenizer();
-        Dictionary<string, List<string>> index;
         PorterStemmer stemmer = new PorterStemmer();
         EnglishStopWordsFilter stopWordsFilter = new EnglishStopWordsFilter();
 
-        public int DocumentCount { get; private set; } = 0;
+        public int DocumentCount => documentData.Keys.Count;
         public int TermCount => index.Count;
+
 
         public InvertedIndex()
         {
-            index = new Dictionary<string, List<string>>();
+            index = new Dictionary<string, Dictionary<string, MatchData>>();
+            documentData = new Dictionary<string, DocumentData>();
         }
 
         internal InvertedIndex(IndexState state)
         {
             index = state.Index;
+            documentData = state.DocumentData;
         }
 
         internal IndexState GetStateForSerialization()
         {
             return new IndexState
             {
-                Index = index
+                Index = index,
+                DocumentData = documentData
             };
         }
 
@@ -54,28 +74,34 @@ namespace FullTextIndex.Core
         {
             var tokens = tokenizer.GetTokens(content.ToLowerInvariant())
                 .Where(t => !stopWordsFilter.IsStopWord(t))
-                .Select(t => stemmer.Stem(t))
-                .Distinct();
+                .Select(t => stemmer.Stem(t));
 
-            foreach (var token in tokens)
+            if (!documentData.ContainsKey(documentId))
+                documentData[documentId] = new DocumentData();
+
+            var doc = documentData[documentId];
+
+            foreach (var term in tokens)
             {
-                Add(token, documentId);
-            }
 
-            DocumentCount++;
+                if (!doc.TermFrequencies.ContainsKey(term))
+                    doc.TermFrequencies[term] = 0;
+
+                doc.TermFrequencies[term]++;
+                doc.Length++;
+
+                Add(term, documentId);
+            }
         }
 
         private void Add(string token, string documentId)
         {
-            if (index.ContainsKey(token))
-            {
-                index[token].Add(documentId);
-                return;
-            }
+            if (!index.ContainsKey(token))
+                index[token] = new Dictionary<string, MatchData>();
 
-            var list = new List<string>();
-            list.Add(documentId);
-            index[token] = list;
+            if (!index[token].ContainsKey(documentId))
+                index[token][documentId] = new MatchData();
+
         }
 
         public IEnumerable<SearchResult> Search(string query)
@@ -83,21 +109,55 @@ namespace FullTextIndex.Core
             var terms = tokenizer.GetTokens(query.ToLowerInvariant())
                    .Where(term => !stopWordsFilter.IsStopWord(term))
                    .Select(term => stemmer.Stem(term))
-                   .Distinct();
+                   .Distinct()
+                   .ToList();
 
             HashSet<string> documentIds = new HashSet<string>();
 
-            foreach(var term in terms)
+            var queryVector = new TermVector();
+            foreach (var term in terms)
+                queryVector.Add(term, 1); // 1 or boost
+
+
+            foreach (var term in terms)
             {
                 if (index.ContainsKey(term))
                 {
-                    foreach (var documentId in index[term])
+                    foreach (var documentId in index[term].Keys)
                         documentIds.Add(documentId);
                 }
-
             }
 
-            return documentIds.Select(id => new SearchResult(id));
+            return documentIds.Select(id =>
+            {
+                var doc = documentData[id];
+                var score = doc.Vector.Similarity(queryVector);
+                return new SearchResult(id, score);
+            })
+            .OrderByDescending(result => result.Score);
+        }
+
+
+        public void Commit()
+        {
+            var averageDocumentLength = documentData.Values.Average(d => d.Length);
+            const float k1 = 1.2f;
+            const float b = 0.75f;
+
+            foreach (var documentId in documentData.Keys)
+            {
+                var doc = documentData[documentId];
+
+                foreach (var term in doc.TermFrequencies.Keys)
+                {
+                    var tf = doc.TermFrequencies[term];
+                    var documentsWithTerm = index[term].Keys.Count;
+                    var idf = InverseDocumentFrequency.For(documentsWithTerm, DocumentCount);
+                    var score = idf * ((k1 + 1) * tf) / (k1 * (1 - b + b * (doc.Length / averageDocumentLength)) + tf);
+
+                    doc.Vector.Add(term, (float)score);
+                }
+            }
         }
     }
 }

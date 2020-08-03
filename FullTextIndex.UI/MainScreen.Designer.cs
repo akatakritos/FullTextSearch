@@ -29,13 +29,14 @@
         private void InitializeComponent()
         {
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.lblSearchResults = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.txtSearch = new System.Windows.Forms.TextBox();
             this.btnSearch = new System.Windows.Forms.Button();
             this.lvResults = new System.Windows.Forms.ListView();
-            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.lblSearchResults = new System.Windows.Forms.ToolStripStatusLabel();
+            this.colTitle = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colAbstract = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colScore = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -50,6 +51,13 @@
             this.statusStrip1.Size = new System.Drawing.Size(800, 22);
             this.statusStrip1.TabIndex = 1;
             this.statusStrip1.Text = "statusStrip1";
+            // 
+            // lblSearchResults
+            // 
+            this.lblSearchResults.Name = "lblSearchResults";
+            this.lblSearchResults.Size = new System.Drawing.Size(726, 17);
+            this.lblSearchResults.Spring = true;
+            this.lblSearchResults.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // lblStatus
             // 
@@ -81,8 +89,9 @@
             // lvResults
             // 
             this.lvResults.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1,
-            this.columnHeader2});
+            this.colScore,
+            this.colTitle,
+            this.colAbstract});
             this.lvResults.HideSelection = false;
             this.lvResults.Location = new System.Drawing.Point(12, 41);
             this.lvResults.Name = "lvResults";
@@ -91,22 +100,19 @@
             this.lvResults.UseCompatibleStateImageBehavior = false;
             this.lvResults.View = System.Windows.Forms.View.Details;
             // 
-            // columnHeader1
+            // colTitle
             // 
-            this.columnHeader1.Text = "Title";
-            this.columnHeader1.Width = 186;
+            this.colTitle.Text = "Title";
+            this.colTitle.Width = 186;
             // 
-            // columnHeader2
+            // colAbstract
             // 
-            this.columnHeader2.Text = "Abstract";
-            this.columnHeader2.Width = 300;
+            this.colAbstract.Text = "Abstract";
+            this.colAbstract.Width = 300;
             // 
-            // lblSearchResults
+            // colScore
             // 
-            this.lblSearchResults.Name = "lblSearchResults";
-            this.lblSearchResults.Size = new System.Drawing.Size(695, 17);
-            this.lblSearchResults.Spring = true;
-            this.lblSearchResults.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.colScore.Text = "Score";
             // 
             // MainScreen
             // 
@@ -135,9 +141,10 @@
         private System.Windows.Forms.TextBox txtSearch;
         private System.Windows.Forms.Button btnSearch;
         private System.Windows.Forms.ListView lvResults;
-        private System.Windows.Forms.ColumnHeader columnHeader1;
-        private System.Windows.Forms.ColumnHeader columnHeader2;
+        private System.Windows.Forms.ColumnHeader colTitle;
+        private System.Windows.Forms.ColumnHeader colAbstract;
         private System.Windows.Forms.ToolStripStatusLabel lblSearchResults;
+        private System.Windows.Forms.ColumnHeader colScore;
     }
 }
 
